@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Caveman.Mcp</PackageId>
+    <Version>1.3.1</Version>
+    <Authors>Francesco Paolo Passaro</Authors>
+    <Company>Digitalsolutions.it</Company>
+    <Description>MCP (Model Context Protocol) server for Caveman — exposes NLP token compression, language detection, content routing and summarization as MCP tools for Claude Code, OpenCode, Cursor, and any MCP-compatible agent.</Description>
+    <PackageTags>AI;NLP;LLM;MCP;PromptEngineering;Claude;Copilot;compression</PackageTags>
+    <RepositoryUrl>https://github.com/francescopaolopassaro/caveman</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/francescopaolopassaro/caveman</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>caveman-icon.png</PackageIcon>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <Copyright>Copyright (c) 2026 Passaro Francesco Paolo - Digitalsolutions.it</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Caveman.Mcp</RootNamespace>
+    <AssemblyName>caveman-mcp</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\caveman.core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="caveman-icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="NOTICE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
