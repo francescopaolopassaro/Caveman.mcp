@@ -1,8 +1,8 @@
 # Caveman.Mcp
 
-![Caveman Logo](caveman-icon.png)
-
 **MCP (Model Context Protocol) server for [Caveman](https://github.com/francescopaolopassaro/caveman)** — exposes NLP token compression, language detection, content routing and summarization as MCP tools for Claude Code, OpenCode, Cursor, Windsurf, and any MCP-compatible agent.
+
+But for Claude and other Agents we recommend our dedicated Synthelion project which can be found here https://github.com/francescopaolopassaro/Synthelion. This MCP was created to have a package to remain in the C#/Caveman environment for future developments facilitated for this kind of purpose. So if you want to use Caveman as an independent MCP and plugin for your agent, use Synthelion.
 
 > Part of the Caveman ecosystem: NLP prompt compressor for LLMs. Up to 70% token reduction, 50+ languages, zero ML models.
 
