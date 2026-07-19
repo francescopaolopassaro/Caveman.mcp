@@ -20,6 +20,9 @@ builder.Services
     .AddSingleton<CavemanCompressionService>()
     .AddSingleton<CavemanSummarizer>(sp =>
         new CavemanSummarizer(sp.GetRequiredService<FunctionWordProvider>()))
+    .AddSingleton<CavemanRetriever>(sp =>
+        new CavemanRetriever(sp.GetRequiredService<FunctionWordProvider>()))
+    .AddSingleton<CavemanCodeCompressor>()
     .AddMcpServer()
     .WithStdioServerTransport()
     .WithToolsFromAssembly(typeof(Program).Assembly);

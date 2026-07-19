@@ -8,6 +8,18 @@ But for Claude and other Agents we recommend our dedicated Synthelion project wh
 
 ---
 
+## Technology Partnership
+
+<img src="https://www.digitalsolutions.it/img/partners/novaroutelogo.png" alt="NovaRouteAI" height="180" style="max-width: 100%; height: auto; min-height: 180px; max-height: 190px;">
+
+**[NovaRouteAI](https://novarouteai.com/?ref=synthelion)** — Build with Chinese AI models through one simple API.
+
+NovaRouteAI helps developers and AI SaaS teams test, compare, and run models like DeepSeek, Qwen, Doubao, Kimi, and GLM without managing multiple provider accounts. Start with test credits and optimize your cost per successful task.
+
+[Click here to know NovaRouteAI](https://novarouteai.com/?ref=synthelion)
+
+---
+
 ## Quick install — Claude Code
 
 ```json
@@ -32,11 +44,14 @@ dotnet tool install --global Caveman.Mcp
 
 | Tool | Description |
 |---|---|
-| **compress** | Removes stop words and lemmatizes text. Up to 70% token reduction. |
+| **compress** | Removes stop words and lemmatizes text. Up to 70% token reduction. Levels: light, semantic, aggressive, statistical, syntactic. |
 | **detect_language** | Identifies language of any text. Returns ISO 639-3 code + confidence scores. |
 | **route_content** | Auto-detects JSON, HTML, diff, log, code or prose and applies best algorithm. |
-| **summarize** | Extractive summarization via TF-IDF or TextRank. |
+| **summarize** | Extractive summarization via TF-IDF or TextRank; `topicAware` segments by topic first. |
 | **compress_batch** | Compresses a list of texts in one call. |
+| **retrieve** | BM25+ ranking of text chunks against a query; optional RM3 pseudo-relevance feedback. |
+| **skeletonize_code** | Strips comments and collapses function/method bodies to signatures only. |
+| **near_duplicate** | SimHash-based near-duplicate detection (Hamming distance) for templated/near-identical text. |
 
 ---
 
@@ -54,6 +69,27 @@ compress(text: "I would like to know if it is possible to receive information.",
 ```
 route_content(content: "[{\"name\":\"Alice\",\"age\":30}]", profile: "balanced")
 → { "compressed": "| name | age |\n| Alice | 30 |", "strategy": "JsonCrush:MarkdownTable", "savings_pct": 47.0 }
+```
+
+### retrieve
+
+```
+retrieve(documents: ["Tesla ships a new battery", "Rivian raises truck price", "GDP grew 2%"], query: "car", topK: 2)
+→ [{ "index": 0, "document": "Tesla ships a new battery", "score": 1.83 }, ...]
+```
+
+### skeletonize_code
+
+```
+skeletonize_code(code: "public int Add(int a, int b) {\n    // sums two numbers\n    return a + b;\n}")
+→ { "compressed": "public int Add(int a, int b) {\n    /* ... */\n}", "functions_skeletonized": 1, ... }
+```
+
+### near_duplicate
+
+```
+near_duplicate(a: "User bob logged in from 10.0.0.1", b: "User alice logged in from 10.0.0.2")
+→ { "is_near_duplicate": true, "hamming_distance": 2, "max_distance": 3 }
 ```
 
 ---

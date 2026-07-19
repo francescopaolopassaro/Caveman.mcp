@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <PackageId>Caveman.Mcp</PackageId>
-    <Version>1.3.1</Version>
+    <Version>1.4.3</Version>
     <Authors>Francesco Paolo Passaro</Authors>
     <Company>Digitalsolutions.it</Company>
-    <Description>MCP (Model Context Protocol) server for Caveman — exposes NLP token compression, language detection, content routing and summarization as MCP tools for Claude Code, OpenCode, Cursor, and any MCP-compatible agent.</Description>
+    <Description>MCP (Model Context Protocol) server for Caveman — exposes NLP token compression, language detection, content routing, summarization, retrieval and code skeletonization as MCP tools for Claude Code, OpenCode, Cursor, and any MCP-compatible agent.</Description>
     <PackageTags>AI;NLP;LLM;MCP;PromptEngineering;Claude;Copilot;compression</PackageTags>
+    <PackageReleaseNotes>1.4.3: aligned with Caveman core 1.4.3 (now referenced as a NuGet dependency instead of a project reference; 1.4.3 is a corrective re-publish of 1.4.2, which was missing several 1.4.x features). compress/compress_batch/summarize already supported the 1.4.1 statistical/syntactic levels; summarize gains a topicAware option (segments text into topics first, allocates the sentence budget proportionally). Three new tools: retrieve (BM25+ ranking over text chunks, optional RM3 pseudo-relevance feedback), skeletonize_code (strips comments and collapses function bodies to signatures), near_duplicate (SimHash-based near-duplicate detection for templated/near-identical text).</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/francescopaolopassaro/caveman</RepositoryUrl>
     <PackageProjectUrl>https://github.com/francescopaolopassaro/caveman</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -24,10 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\caveman.core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Caveman" Version="1.4.3" />
     <PackageReference Include="ModelContextProtocol" Version="1.4.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
   </ItemGroup>
