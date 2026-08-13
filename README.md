@@ -52,6 +52,8 @@ dotnet tool install --global Caveman.Mcp
 | **retrieve** | BM25+ ranking of text chunks against a query; optional RM3 pseudo-relevance feedback. |
 | **skeletonize_code** | Strips comments and collapses function/method bodies to signatures only. |
 | **near_duplicate** | SimHash-based near-duplicate detection (Hamming distance) for templated/near-identical text. |
+| **compress_sql** | Whitespace-safe SQL compression (optional comment stripping and CCR value-folding) for sending SQL to an LLM cheaply. |
+| **idf_languages** | Lists the 56 shipped global-IDF tables and, for a given ISO 639-3 code, whether a table exists and its corpus size. |
 
 ---
 
@@ -90,6 +92,23 @@ skeletonize_code(code: "public int Add(int a, int b) {\n    // sums two numbers\
 ```
 near_duplicate(a: "User bob logged in from 10.0.0.1", b: "User alice logged in from 10.0.0.2")
 → { "is_near_duplicate": true, "hamming_distance": 2, "max_distance": 3 }
+```
+
+### compress_sql
+
+```
+compress_sql(sql: "SELECT  id, name\nFROM     users\nWHERE    age > 18;")
+→ { "compressed": "SELECT id, name FROM users WHERE age > 18;", "was_compressed": true, "tuples_dropped": 0, "ccr_hash": null }
+
+compress_sql(sql: "INSERT INTO t VALUES (1,'a'),(2,'b'),(3,'c');", foldValues: true)
+→ { "compressed": "INSERT INTO t VALUES (1,'a'),(2,'b'),(3,'c'); -- CCR:3f2a9b1c8d4e", "was_compressed": true, "tuples_dropped": 0, "ccr_hash": "3f2a9b1c8d4e" }
+```
+
+### idf_languages
+
+```
+idf_languages(iso3: "eng")
+→ { "language_count": 56, "languages": [ "ben", "bul", "cat", ... ], "iso3": "eng", "has_data": true, "corpus_size": 1150000000 }
 ```
 
 ---

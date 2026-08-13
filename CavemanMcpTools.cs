@@ -89,6 +89,48 @@ internal sealed class CavemanMcpTools(
         });
     }
 
+    [McpServerTool(Name = "compress_sql")]
+    [Description("Whitespace-safe SQL compression: collapses redundant formatting while preserving string literals, quoted identifiers, nested parentheses and comments. With stripComments=true, SQL comments are removed; with foldValues=true, VALUES tuples are replaced by a content-derived hash reference (reported in ccr_hash, retrievable within a short TTL) and tuples_dropped counts how many were folded. Use before sending SQL to an LLM to save tokens without breaking the statement.")]
+    public string CompressSql(
+        [Description("SQL statement or script to compress")] string sql,
+        [Description("Remove SQL comments (-- and /* */) (default: false)")] bool stripComments = false,
+        [Description("Replace VALUES tuples with a content hash reference and report dropped tuples (default: false)")] bool foldValues = false,
+        [Description("Maximum VALUES tuples kept before folding the rest (default: 8)")] int maxValues = 8)
+    {
+        var compressor = new CavemanSqlCompressor();
+        var r = compressor.Compress(sql, stripComments, foldValues, maxValues);
+        return JsonSerializer.Serialize(new
+        {
+            compressed     = r.Compressed,
+            was_compressed = r.WasCompressed,
+            tuples_dropped = r.TuplesDropped,
+            ccr_hash       = r.CcrHash
+        });
+    }
+
+    [McpServerTool(Name = "idf_languages")]
+    [Description("Reports the 56 per-language global IDF tables shipped with v1.4.4 (used by the statistical level's 50/50 global-IDF blend and the aggressive ubiquity gate). When iso3 is given, returns whether a table exists for it and its reference-corpus size.")]
+    public string IdfLanguages(
+        [Description("ISO 639-3 code to check for a shipped global-IDF table (optional)")] string? iso3 = null)
+    {
+        var languages = CavemanGlobalIdfProvider.GetShippedLanguages().OrderBy(l => l).ToList();
+        var payload = new Dictionary<string, object>
+        {
+            ["language_count"] = languages.Count,
+            ["languages"] = languages
+        };
+
+        if (!string.IsNullOrWhiteSpace(iso3))
+        {
+            var provider = new CavemanGlobalIdfProvider();
+            payload["iso3"] = iso3.ToLowerInvariant();
+            payload["has_data"] = provider.HasData(iso3.ToLowerInvariant());
+            payload["corpus_size"] = provider.GetCorpusSize(iso3.ToLowerInvariant());
+        }
+
+        return JsonSerializer.Serialize(payload);
+    }
+
     [McpServerTool(Name = "summarize")]
     [Description("Extractive summarization — selects the most important sentences using TF-IDF or TextRank. Keeps the meaning, discards redundancy. Set topicAware=true to segment the text into topics first and allocate the sentence budget proportionally across them, so one dense topic can't starve the rest.")]
     public string Summarize(
