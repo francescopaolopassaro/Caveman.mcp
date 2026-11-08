@@ -23,6 +23,9 @@ builder.Services
     .AddSingleton<CavemanRetriever>(sp =>
         new CavemanRetriever(sp.GetRequiredService<FunctionWordProvider>()))
     .AddSingleton<CavemanCodeCompressor>()
+    .AddSingleton<CavemanSemanticCache>(sp =>
+        new CavemanSemanticCache(provider: sp.GetRequiredService<FunctionWordProvider>(),
+                                 detector: sp.GetRequiredService<CavemanLanguageDetector>()))
     .AddMcpServer()
     .WithStdioServerTransport()
     .WithToolsFromAssembly(typeof(Program).Assembly);

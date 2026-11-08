@@ -20,7 +20,8 @@ internal sealed class CavemanMcpTools(
     CavemanLanguageDetector detector,
     CavemanSummarizer summarizer,
     CavemanRetriever retriever,
-    CavemanCodeCompressor codeCompressor)
+    CavemanCodeCompressor codeCompressor,
+    CavemanSemanticCache semanticCache)
 {
     [McpServerTool(Name = "compress")]
     [Description("Removes stop words and lemmatizes text to reduce LLM token count. Up to 70% token reduction across 50+ languages. Language is auto-detected.")]
@@ -241,5 +242,41 @@ internal sealed class CavemanMcpTools(
             CavemanSimHash.Compute(b, shingleSize));
 
         return JsonSerializer.Serialize(new { is_near_duplicate = isDuplicate, hamming_distance = distance, max_distance = maxDistance });
+    }
+
+    [McpServerTool(Name = "semantic_cache_get")]
+    [Description("Looks a query up in the semantic cache. A paraphrase of an earlier query (same meaning, different words, order or punctuation) returns the cached answer so the agent does not pay for it again. Works in every language Caveman supports. Numbers, file names, identifiers and quoted strings must match exactly. Returns hit=false on a miss.")]
+    public string SemanticCacheGet(
+        [Description("The query to look up")] string query)
+    {
+        if (semanticCache.TryGet(query, out var hit))
+            return JsonSerializer.Serialize(new { hit = true, response = hit.Response, similarity = Math.Round(hit.Similarity, 3), matched_query = hit.MatchedQuery, language = hit.Language });
+        return JsonSerializer.Serialize(new { hit = false });
+    }
+
+    [McpServerTool(Name = "semantic_cache_set")]
+    [Description("Stores an answer in the semantic cache under the query, so later paraphrases of the query can be answered from the cache (see semantic_cache_get). Call it after the agent has produced a fresh answer.")]
+    public string SemanticCacheSet(
+        [Description("The query the answer belongs to")] string query,
+        [Description("The answer to cache")] string response)
+    {
+        semanticCache.Set(query, response);
+        return JsonSerializer.Serialize(new { stored = true, entries = semanticCache.Count });
+    }
+
+    [McpServerTool(Name = "semantic_cache_stats")]
+    [Description("Returns the semantic cache counters: entries, hits, misses, hit rate and the characters of answers served from the cache.")]
+    public string SemanticCacheStats()
+    {
+        var s = semanticCache.Stats;
+        return JsonSerializer.Serialize(new { entries = semanticCache.Count, hits = s.Hits, misses = s.Misses, hit_rate = Math.Round(s.HitRate, 3), chars_saved = s.CharsSaved });
+    }
+
+    [McpServerTool(Name = "semantic_cache_clear")]
+    [Description("Empties the semantic cache.")]
+    public string SemanticCacheClear()
+    {
+        semanticCache.Clear();
+        return JsonSerializer.Serialize(new { cleared = true });
     }
 }

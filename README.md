@@ -53,6 +53,10 @@ dotnet tool install --global Caveman.Mcp
 | **skeletonize_code** | Strips comments and collapses function/method bodies to signatures only. |
 | **near_duplicate** | SimHash-based near-duplicate detection (Hamming distance) for templated/near-identical text. |
 | **compress_sql** | Whitespace-safe SQL compression (optional comment stripping and CCR value-folding) for sending SQL to an LLM cheaply. |
+| **semantic_cache_get** | *(1.5.0)* Looks a query up in the semantic cache: a paraphrase of an earlier query returns the cached answer, in every supported language. |
+| **semantic_cache_set** | *(1.5.0)* Stores an answer under a query so later paraphrases can be answered without a new model call. |
+| **semantic_cache_stats** | *(1.5.0)* Entries, hits, misses, hit rate and characters served from the cache. |
+| **semantic_cache_clear** | *(1.5.0)* Empties the semantic cache. |
 | **idf_languages** | Lists the 56 shipped global-IDF tables and, for a given ISO 639-3 code, whether a table exists and its corpus size. |
 
 ---
@@ -104,6 +108,22 @@ compress_sql(sql: "INSERT INTO t VALUES (1,'a'),(2,'b'),(3,'c');", foldValues: t
 → { "compressed": "INSERT INTO t VALUES (1,'a'),(2,'b'),(3,'c'); -- CCR:3f2a9b1c8d4e", "was_compressed": true, "tuples_dropped": 0, "ccr_hash": "3f2a9b1c8d4e" }
 ```
 
+### semantic_cache_get / semantic_cache_set
+
+An agent calls `semantic_cache_get` before spending a model call, and `semantic_cache_set` after producing a fresh answer.
+Numbers, file names, identifiers and quoted strings must match exactly, so a question about `Program.cs` never hits one about `Startup.cs`.
+
+```
+semantic_cache_set(query: "How do I delete the file Program.cs from the project?", response: "git rm Program.cs")
+→ { "stored": true, "entries": 1 }
+
+semantic_cache_get(query: "How to delete file Program.cs from project?")
+→ { "hit": true, "response": "git rm Program.cs", "similarity": 1, "matched_query": "How do I delete the file Program.cs from the project?", "language": "eng" }
+
+semantic_cache_get(query: "How do I delete the file Startup.cs from the project?")
+→ { "hit": false }
+```
+
 ### idf_languages
 
 ```
@@ -112,6 +132,11 @@ idf_languages(iso3: "eng")
 ```
 
 ---
+
+## Requirements
+
+Caveman.Mcp 1.5.0 targets **.NET 10**. It is a real .NET tool (`dotnet tool install --global Caveman.Mcp`, command `caveman-mcp`) built on Caveman 1.5.0.
+Earlier versions were published as a plain package; from 1.5.0 the tool install above works as documented.
 
 ## Supported languages (50+)
 
